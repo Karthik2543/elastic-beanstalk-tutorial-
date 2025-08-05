@@ -1,0 +1,28 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      php: 8.1
+    commands:
+      - echo "Installing Composer..."
+      - curl -sS https://getcomposer.org/installer | php
+      - mv composer.phar /usr/local/bin/composer
+      - echo "Installing dependencies..."
+      - composer install --no-dev --optimize-autoloader
+
+  pre_build:
+    commands:
+      - echo "Generating Laravel cache..."
+      - php artisan config:cache || true
+      - php artisan route:cache || true
+      - php artisan view:cache || true
+
+  build:
+    commands:
+      - echo "Zipping application for deployment..."
+      - zip -r ../laravel.zip .
+
+artifacts:
+  files:
+    - ../laravel.zip
